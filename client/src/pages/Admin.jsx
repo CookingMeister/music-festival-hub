@@ -9,6 +9,7 @@ import axios from 'axios';
 const Admin = () => {
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
+  const [refreshData, setRefreshData] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateUserModal, setShowUpdateUserModal] = useState(false);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
@@ -67,7 +68,7 @@ const Admin = () => {
     };
 
     fetchProducts();
-  }, [products]);
+  }, [refreshData]);
 
   //gets all users from db
   useEffect(() => {
@@ -119,6 +120,7 @@ const Admin = () => {
           product._id === productId ? { ...product, ...product } : product
         )
       );
+      setRefreshData(prev => prev + 1); // Increment to trigger refresh
     } catch (error) {
       console.error('Error updating product:', error);
     }
@@ -146,6 +148,7 @@ const Admin = () => {
         availability: true,
         imageUrl: 'logo.png',
       });
+      setRefreshData(prev => prev + 1);
     } catch (error) {
       console.error('Error creating product:', error);
     }
@@ -161,6 +164,7 @@ const Admin = () => {
       });
       // remove the deleted product from the products state
       setProducts(products.filter((product) => product._id !== productId));
+      setRefreshData(prev => prev + 1);
     } catch (error) {
       console.error('Error deleting product:', error);
     }

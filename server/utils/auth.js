@@ -34,11 +34,8 @@ export const authMiddleware = (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res
+    return res
       .status(401)
-      .json({
-        error:
-          'Invalid token. Please provide a valid token for authentication.',
-      });
+      .json({ error: 'Invalid token. Please provide a valid token for authentication.' });
   }
 };

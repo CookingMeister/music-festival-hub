@@ -34,7 +34,7 @@ customfestivalwear.ca is the ultimate destination for connecting with fellow fes
 
   - Node.js installed (version 12.x or higher recommended)
   - npm (Node Package Manager) installed
-  - Nodemon installed
+  - Nodemon installed (optional)
   - MongoDB installed and running locally or access to a MongoDB Atlas cluster
 
 #### Setting Up Your Project
@@ -43,41 +43,64 @@ customfestivalwear.ca is the ultimate destination for connecting with fellow fes
 
 1. Clone the repository
 
+   ```bash
+   git clone https://github.com/CookingMeister/music-festival-hub.git
+   cd music-festival-hub
+   ```
+
 2. Install dependencies
 
     - Navigate to the project directory and run: `npm install`
 
 3. Set up environment variables
 
-    - Create a .env file in the root of your project directory. Add the necessary environment variables as specified in the .env.Example file provided in the project.
+    - Create a .env file in the `server` directory of your project directory. Add the necessary environment variables as specified in the .env.Example file provided in the project.
     
     - Make sure to replace the placeholder values with your actual data. For example:
 
-```code
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/yourdatabasename
-JWT_SECRET=your_secret_here
-```
+   ```code
+   PORT=3000
+   MONGODB_URI=mongodb://localhost:27017/festival-hub
+   JWT_SECRET=your_secret_key_here
+   ```
 
-4. Start the MongoDB server and seed the database
+4. Start the MongoDB server
+   - If using a local MongoDB server: `mongod`
+   - If using MongoDB Atlas, ensure your connection string in the `.env` file is correct
 
-    - Ensure your MongoDB server is running. If you're using a local MongoDB server, you can start it with: `mongod`
+5. Seed the database (optional)
 
-    - Next, seed the database with the provided seed data: `npm run seed`
+   ```bash
+   npm run seed
+   ```
 
-    - If you're using MongoDB Atlas, ensure your connection string in the .env file matches your cluster's connection details.
+6. Start the application
+   - For development (with hot reloading):
 
-5. Run the application
+   ```bash
+   npm run dev
+    ```
 
-    - To start the application, run: `npm start`
+    - For production:
 
-    - This will start the server on the port specified in your .env file (or port 3000 by default). You can access the application by navigating to [localhost:3000](http://localhost:3000) in your browser.
+    ```bash
+   npm run build
+   npm start
+   ```
 
-#### Development
+7. Access the application
+   - Frontend: [http://localhost:3000](http://localhost:3000)
 
-- For development, you might want to run the application in development mode with nodemon for automatic server restarts on code changes: `npm run dev`
+#### CORS Configuration
 
-- Ensure you have `nodemon` installed globally or as a dev dependency in your project.
+The application is configured to accept requests from both the production domain and localhost for development purposes. If you're experiencing CORS issues, check the `corsOptions` in `server/server.js`.
+
+#### Admin Features
+
+The Admin page provides a comprehensive dashboard for managing:
+
+- **Products**: Add, update, and delete products in the Art Market
+- **Users**: Manage user accounts, update profiles, and remove users if necessary
 
 ## User Story
 
@@ -151,7 +174,12 @@ THEN I am brought to the Order Confirmation Modal  that displays my cart items p
 
 ![alt text](client/public/builtwith.png)
 
--[Stripe](https://docs.stripe.com/payments?payments=popular) (Future Development)
+- **Frontend**: React, React Bootstrap, Axios
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB, Mongoose
+- **Authentication**: JWT (JSON Web Tokens)
+- **Deployment**: Render.com
+- **Future Development**: [Stripe](https://docs.stripe.com/payments?payments=popular) for payment processing
 
 **Assets**
 
@@ -191,4 +219,4 @@ If you have an questions about this app, please contact CookingMeister at [Linke
 
 This project is licensed under the [MIT License](LICENSE).
 
-&copy; 2024
+&copy; 2025
