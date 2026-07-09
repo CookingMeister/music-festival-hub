@@ -34,7 +34,7 @@ app.use(routes);
 
 const __dirname = path.resolve();
 // Serve static files from the dist folder (uncomment on build, comment out for dev)
-//app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Connect to MongoDB
 connectDB();
@@ -46,10 +46,10 @@ app.listen(port, () => {
 });
 
 // Catch-all route to serve index.html for client-side routing
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client/dist/', 'index.html')); // (uncomment on build, comment out for dev)
-// });
-
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/', 'index.html'));  // (comment out on build, uncomment for dev)
+  res.sendFile(path.join(__dirname, '../client/dist/', 'index.html')); // (uncomment on build, comment out for dev)
 });
+
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../client/', 'index.html'));  // (comment out on build, uncomment for dev)
+// });
