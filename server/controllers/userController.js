@@ -7,7 +7,11 @@ import User from "./../models/profileModels/userModel/user.js";
 
 //  Register User
 const registerUser = async (req, res) => {
-  console.log(req.body);
+  console.log({
+    userId,
+    username: req.body.username,
+    email: req.body.email,
+  });
   try {
     const { username, email, password } = req.body;
 
@@ -78,7 +82,11 @@ const updateUserProfile = async (req, res) => {
     const userId = req.userId;
 
     console.log("userId:", userId);
-    console.log("update body:", req.body);
+    console.log({
+      userId,
+      username: req.body.username,
+      email: req.body.email,
+    });
 
     const { name, username, email, password, socials, aboutMe, topFestivals } =
       req.body;
@@ -86,7 +94,20 @@ const updateUserProfile = async (req, res) => {
     const updateFields = {};
 
     if (name !== undefined) updateFields.name = name;
-    if (username !== undefined) updateFields.username = username;
+    if (username) {
+      const existingUser = await User.findOne({
+        username,
+        _id: { $ne: userId },
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          error: "Username already exists",
+        });
+      }
+
+      updateFields.username = username;
+    }
     if (email !== undefined) updateFields.email = email;
     if (socials !== undefined) updateFields.socials = socials;
     if (aboutMe !== undefined) updateFields.aboutMe = aboutMe;
@@ -111,6 +132,13 @@ const updateUserProfile = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     console.error("Update user failed:", error);
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        error: "Username or email already exists",
+      });
+    }
+
     res.status(500).json({
       error: error.message,
     });
