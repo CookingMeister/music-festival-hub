@@ -10,7 +10,7 @@
     "setup": "cd ./server && npm i && cd ../client && npm i",
     "seed": "cd ./server && npm run seed ",
     "build": "cd ./client && npm run build",
-    "render-build": "npm setup && npm run build",
+    "render-build": "npm run setup && npm run build",
     "start": "cd ./server && npm start"
   },
   "keywords": [],
