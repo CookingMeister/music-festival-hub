@@ -2,8 +2,8 @@ import {
   generateToken,
   hashPassword,
   comparePassword,
-} from './../utils/auth.js';
-import User from './../models/profileModels/userModel/user.js';
+} from "./../utils/auth.js";
+import User from "./../models/profileModels/userModel/user.js";
 
 //  Register User
 const registerUser = async (req, res) => {
@@ -14,7 +14,7 @@ const registerUser = async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: "User already exists" });
     }
 
     // Hash the password
@@ -36,21 +36,22 @@ const registerUser = async (req, res) => {
     // Send the token and user details in the response
     res.status(201).json({ token, user: savedUser });
   } catch (error) {
-    console.error('Registration failed', error);
-    res.status(500).json({ error: 'Registration failed' });
+    console.error("Registration failed", error);
+    res.status(500).json({ error: "Registration failed" });
   }
 };
 
 // Get All Users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password');
+    const users = await User.find().select("-password");
     if (users.length === 0) {
-      return res.status(404).json({ error: 'No users found' });
+      return res.status(404).json({ error: "No users found" });
     }
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch users' });
+    console.error("Get all users failed:", error);
+    res.status(500).json({ error: "Failed to fetch users" });
   }
 };
 
@@ -58,48 +59,61 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log('userId:', userId);
-    const user = await User.findById(userId).select('-password');
+    console.log("userId:", userId);
+    const user = await User.findById(userId).select("-password");
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
-    console.log('User:', user);
+    console.log("User:", user);
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch user data' });
+    console.error("Get user by ID failed:", error);
+    res.status(500).json({ error: "Failed to fetch user data" });
   }
 };
 
 //  Update User Profile
 const updateUserProfile = async (req, res) => {
   try {
-    const { name, username, password, socials, aboutMe, topFestivals } =
-      req.body;
     const userId = req.userId;
-    console.log('userId:', userId);
 
-    const updateFields = { name, socials, aboutMe, topFestivals };
+    console.log("userId:", userId);
+    console.log("update body:", req.body);
 
-    if (username) {
-      updateFields.username = username;
-    }
+    const { name, username, email, password, socials, aboutMe, topFestivals } =
+      req.body;
+
+    const updateFields = {};
+
+    if (name !== undefined) updateFields.name = name;
+    if (username !== undefined) updateFields.username = username;
+    if (email !== undefined) updateFields.email = email;
+    if (socials !== undefined) updateFields.socials = socials;
+    if (aboutMe !== undefined) updateFields.aboutMe = aboutMe;
+    if (topFestivals !== undefined) updateFields.topFestivals = topFestivals;
 
     if (password) {
       updateFields.password = await hashPassword(password);
     }
 
-    // Find the user by ID and update the profile fields
     const user = await User.findByIdAndUpdate(userId, updateFields, {
       new: true,
-    });
+    }).select("-password");
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({
+        error: "User not found",
+      });
     }
-    console.log('Updated User:', user);
+
+    console.log("Updated User:", user);
+
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Update user failed:", error);
+    res.status(500).json({
+      error: error.message,
+    });
   }
 };
 
@@ -110,9 +124,10 @@ const createUserProfile = async (req, res) => {
     const hashedPassword = await hashPassword(password);
     const newUser = new User({ ...userData, password: hashedPassword });
     const savedUser = await newUser.save();
-    console.log('New User:', savedUser);
+    console.log("New User:", savedUser);
     res.status(201).json(savedUser);
   } catch (error) {
+    console.error("CREATE USER PROFILE ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -123,18 +138,19 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid username' });
+      return res.status(401).json({ error: "Invalid username" });
     }
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid password' });
+      return res.status(401).json({ error: "Invalid password" });
     }
     // Generate a token for the user
     const token = generateToken(user._id);
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ error: 'Login failed' });
+    console.error("LOGIN ERROR:", error);
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
@@ -143,11 +159,12 @@ const deleteUser = async (req, res) => {
     const userId = req.userId;
     const user = await User.findByIdAndDelete(userId);
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
-    console.log('Deleted User:', user);
+    console.log("Deleted User:", user);
     res.status(200).json(user);
   } catch (error) {
+    console.error("DELETE USER ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -156,9 +173,10 @@ const logoutUser = (req, res) => {
   try {
     // Clear the token from the client-side local storage
     // No server-side logout logic is required since using JWT
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    res.status(500).json({ error: 'Logout failed' });
+    console.error("LOGOUT ERROR:", error);
+    res.status(500).json({ error: "Logout failed" });
   }
 };
 
