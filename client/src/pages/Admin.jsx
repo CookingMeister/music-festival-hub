@@ -87,7 +87,7 @@ const Admin = () => {
     };
 
     fetchUsers();
-  }, [updateUser]);
+  }, [refreshData]);
 
   const handleShowModal = (product) => {
     setEditProduct(product);
@@ -192,6 +192,7 @@ const Admin = () => {
         socials: '',
         topFestivals: '',
       });
+      setRefreshData(prev => prev + 1);
     } catch (error) {
       console.error('Error creating user:', error);
     }
@@ -201,7 +202,7 @@ const Admin = () => {
   const updateUserProfile = async (userId, updateUser) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`/api/admin/users/profile`, updateUser, {
+      const response = await axios.put(`/api/admin/users/${userId}`, updateUser, {
         headers: {
           Authorization: token,
         },
@@ -209,8 +210,8 @@ const Admin = () => {
       // Update the users state
       setUsers(
         users.map((user) =>
-          user.username === updateUser.username
-            ? { ...user, ...updateUser }
+          user._id === userId
+            ? { ...user, ...response.data }
             : user
         )
       );
@@ -225,6 +226,7 @@ const Admin = () => {
         topFestivals: '',
       });
       setShowUpdateUserModal(false);
+      setRefreshData(prev => prev + 1);
     } catch (error) {
       console.error('Error updating user profile:', error);
     }
@@ -241,6 +243,7 @@ const Admin = () => {
       });
       // Remove the deleted user from the users state
       setUsers(users.filter((user) => user._id !== userId));
+      setRefreshData(prev => prev + 1);
     } catch (error) {
       console.error('Error deleting user:', error);
     }

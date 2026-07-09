@@ -7,22 +7,18 @@ import {
 } from '../../utils/auth.js';
 import {
   deleteUser,
+  updateUserById,
   deleteProduct,
   updateProduct,
   createProduct,
 } from '../../controllers/adminController.js';
-import {
-  updateUserProfile,
-  createUserProfile,
-} from '../../controllers/userController.js';
+import { createUserProfile } from '../../controllers/userController.js';
 
 const router = express.Router();
 
 // Admin Create and Update User Routes
-router
-  .route('/users/profile')
-    .post(authMiddleware, createUserProfile)
-    .put(authMiddleware, updateUserProfile);
+router.post('/users/profile', authMiddleware, createUserProfile);
+router.put('/users/:userId', authMiddleware, updateUserById);
 
 // Admin Delete User Route
 router.delete('/users/profile/:userId', authMiddleware, deleteUser);
